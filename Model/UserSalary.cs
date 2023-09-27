@@ -8,7 +8,8 @@ namespace UserMgmt.Model
         public int Id { get; set; }
 
         [Required]
-        public string userId { get; set; }
+        [ForeignKey("UsersInfo")]
+        public int userId { get; set; }
         
         public decimal? Salary { get; set; }
         [Required]
@@ -16,11 +17,12 @@ namespace UserMgmt.Model
         [Required]
         public string? AccountNumber { get; set; }
         public  bool? HasMediclaim { get; set; }
-      
-        public int? MediclaimTypeId { get; set; }
 
-        public  MediclaimType MediclaimTypes { get; set; }
-        
-        public UsersInfo UsersInfos { get; set; }
+        [ForeignKey("MediclaimType")]
+        public int MediclaimTypeId { get; set; }
+
+        public  MediclaimType MediclaimType { get; set; }
+       
+        public  UsersInfo UsersInfo { get; set; }
     }
 }

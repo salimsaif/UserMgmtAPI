@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,14 +23,19 @@ namespace UserMgmt.Controllers
         }
 
         // GET: api/UsersInfoes
-        [HttpGet]
+        [HttpGet] 
         public async Task<ActionResult<IEnumerable<UsersInfo>>> GetUsersInfo()
         {
           if (_context.UsersInfo == null)
           {
               return NotFound();
           }
-            return await _context.UsersInfo.ToListAsync();
+
+            //IEnumerable<UsersInfo> dd = await _context.UsersInfo.Include(x => x.UserSalary).ToListAsync();
+            //IEnumerable<UsersInfo> dd = await _context.UsersInfo.ToListAsync();
+
+            //return Ok(dd);
+            return await _context.UsersInfo.Include(x=>x.UserSalary).ToListAsync();
         }
 
         // GET: api/UsersInfoes/5
@@ -52,7 +58,7 @@ namespace UserMgmt.Controllers
 
         // PUT: api/UsersInfoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut("{id}")]      
         public async Task<IActionResult> PutUsersInfo(int id, UsersInfo usersInfo)
         {
             if (id != usersInfo.Id)
@@ -69,6 +75,49 @@ namespace UserMgmt.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!UsersInfoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("userInfoEdit1")]
+        public async Task<IActionResult> PostUsersInfoEdit1(int id)
+        {
+           
+            return NoContent();
+        }
+
+        [HttpPost("userInfoEdit")]
+        public async Task<IActionResult> PostUsersInfoEdit(UsersInfoUpdate usersInfo)
+            {
+            if (usersInfo.Id == null)
+            {
+                return BadRequest();
+            }
+
+            var userdata=_context.UsersInfo.Include(m=>m.UserSalary).FirstOrDefault(x=>x.Id == usersInfo.Id);
+
+            //_context.Entry(usersInfo).State = EntityState.Modified;
+            userdata.FirstName=usersInfo.FirstName;
+            userdata.LastName=usersInfo.LastName;
+            userdata.Location=usersInfo.Location;
+            userdata.UserSalary.Salary = usersInfo.salary;
+
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UsersInfoExists(usersInfo.Id))
                 {
                     return NotFound();
                 }
