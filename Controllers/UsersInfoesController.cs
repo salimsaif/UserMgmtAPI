@@ -87,12 +87,7 @@ namespace UserMgmt.Controllers
             return NoContent();
         }
 
-        [HttpPost("userInfoEdit1")]
-        public async Task<IActionResult> PostUsersInfoEdit1(int id)
-        {
-           
-            return NoContent();
-        }
+       
 
         [HttpPost("userInfoEdit")]
         public async Task<IActionResult> PostUsersInfoEdit(UsersInfoUpdate usersInfo)
