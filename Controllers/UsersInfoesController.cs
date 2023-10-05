@@ -30,8 +30,7 @@ namespace UserMgmt.Controllers
           {
               return NotFound();
           }
-            var userDetail=await _context.UsersInfo.Include(x=>x.UserSalary).ToListAsync();
-            //var testinfo = Convert.ToBase64String(userinf.ToArray()[0].UserImage);
+            var userDetail=await _context.UsersInfo.Include(x=>x.UserSalary).ToListAsync();          
 
             return userDetail;
         }
