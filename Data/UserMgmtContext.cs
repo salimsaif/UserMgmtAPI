@@ -15,5 +15,9 @@ namespace UserMgmt.Data
         }
 
         public DbSet<UserMgmt.Model.UsersInfo> UsersInfo { get; set; } = default!;
+
+        public DbSet<UserMgmt.Model.UserSalary> UserSalary { get; set; } = default!;
+
+        public DbSet<UserMgmt.Model.MediclaimType> MediclaimType { get; set; } = default!;
     }
 }

@@ -24,15 +24,18 @@ namespace UserMgmt.Controllers
 
         // GET: api/UsersInfoes
         [HttpGet] 
-        public async Task<ActionResult<IEnumerable<UsersInfo>>> GetUsersInfo()
+        public async Task<ActionResult<IEnumerable<ViewUserInfo>>> GetUsersInfo()
         {
           if (_context.UsersInfo == null)
           {
               return NotFound();
           }
-            var userDetail=await _context.UsersInfo.Include(x=>x.UserSalary).ToListAsync();          
+            var userDetail=await _context.UsersInfo.Include(x=>x.UserSalary).ThenInclude(z=>z.MediclaimType).ToListAsync();
+            var viewuserinfo = userDetail.Select(x => new ViewUserInfo { Id = x.Id, FirstName = x.FirstName, LastName = x.LastName, DateHired = x.DateHired, MType = x.UserSalary.MediclaimType.MType, UserImage = x.UserImage, UserName = x.UserName, Salary = x.UserSalary.Salary, Location=x.Location });
 
-            return userDetail;
+            //var userMedtype=_context.UserSalary
+
+            return Ok(viewuserinfo);
         }
 
         // GET: api/UsersInfoes/5
