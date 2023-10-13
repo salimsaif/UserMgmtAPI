@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UserMgmt.Data;
 using UserMgmt.Model;
 
 namespace UserMgmt.Controllers
 {
-    public class MediclaimTypesController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class MediclaimTypesController : ControllerBase
     {
         private readonly UserMgmtContext _context;
 
@@ -19,145 +21,104 @@ namespace UserMgmt.Controllers
             _context = context;
         }
 
-        // GET: MediclaimTypes
-        public async Task<IActionResult> Index()
+        // GET: api/MediclaimTypes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<MediclaimType>>> GetMediclaimType()
         {
-              return _context.MediclaimType != null ? 
-                          View(await _context.MediclaimType.ToListAsync()) :
-                          Problem("Entity set 'UserMgmtContext.MediclaimType'  is null.");
+          if (_context.MediclaimType == null)
+          {
+              return NotFound();
+          }
+            return await _context.MediclaimType.ToListAsync();
         }
 
-        // GET: MediclaimTypes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/MediclaimTypes/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MediclaimType>> GetMediclaimType(int id)
         {
-            if (id == null || _context.MediclaimType == null)
-            {
-                return NotFound();
-            }
-
-            var mediclaimType = await _context.MediclaimType
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (mediclaimType == null)
-            {
-                return NotFound();
-            }
-
-            return View(mediclaimType);
-        }
-
-        // GET: MediclaimTypes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: MediclaimTypes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,MType")] MediclaimType mediclaimType)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(mediclaimType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(mediclaimType);
-        }
-
-        // GET: MediclaimTypes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.MediclaimType == null)
-            {
-                return NotFound();
-            }
-
+          if (_context.MediclaimType == null)
+          {
+              return NotFound();
+          }
             var mediclaimType = await _context.MediclaimType.FindAsync(id);
+
             if (mediclaimType == null)
             {
                 return NotFound();
             }
-            return View(mediclaimType);
+
+            return mediclaimType;
         }
 
-        // POST: MediclaimTypes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,MType")] MediclaimType mediclaimType)
+        // PUT: api/MediclaimTypes/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutMediclaimType(int id, MediclaimType mediclaimType)
         {
             if (id != mediclaimType.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(mediclaimType).State = EntityState.Modified;
+
+            try
             {
-                try
-                {
-                    _context.Update(mediclaimType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MediclaimTypeExists(mediclaimType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
             }
-            return View(mediclaimType);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MediclaimTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        // GET: MediclaimTypes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // POST: api/MediclaimTypes
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<MediclaimType>> PostMediclaimType(MediclaimType mediclaimType)
         {
-            if (id == null || _context.MediclaimType == null)
+          if (_context.MediclaimType == null)
+          {
+              return Problem("Entity set 'UserMgmtContext.MediclaimType'  is null.");
+          }
+            _context.MediclaimType.Add(mediclaimType);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetMediclaimType", new { id = mediclaimType.Id }, mediclaimType);
+        }
+
+        // DELETE: api/MediclaimTypes/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMediclaimType(int id)
+        {
+            if (_context.MediclaimType == null)
             {
                 return NotFound();
             }
-
-            var mediclaimType = await _context.MediclaimType
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var mediclaimType = await _context.MediclaimType.FindAsync(id);
             if (mediclaimType == null)
             {
                 return NotFound();
             }
 
-            return View(mediclaimType);
-        }
-
-        // POST: MediclaimTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.MediclaimType == null)
-            {
-                return Problem("Entity set 'UserMgmtContext.MediclaimType'  is null.");
-            }
-            var mediclaimType = await _context.MediclaimType.FindAsync(id);
-            if (mediclaimType != null)
-            {
-                _context.MediclaimType.Remove(mediclaimType);
-            }
-            
+            _context.MediclaimType.Remove(mediclaimType);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return NoContent();
         }
 
         private bool MediclaimTypeExists(int id)
         {
-          return (_context.MediclaimType?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.MediclaimType?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
